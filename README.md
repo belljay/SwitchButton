@@ -3,7 +3,12 @@
 
 # SwitchButton
 
-Note: this repo is forked and fixed forward on top of the awesome repo of [zcweng/SwitchButton](https://github.com/zcweng/SwitchButton). I upgraded API level to 29 so that it's compatiable with latest Google Play store requirements. Codebase is also upgraded to AndroidX for latest reference. Some minor discrepency is also fixed.
+Note: this repo is forked and fixed forward on top of the awesome repo of [zcweng/SwitchButton](https://github.com/zcweng/SwitchButton).
+
+- Ugraded API level to 29 so that it's compatiable with latest Google Play store requirements.
+- Codebase is also upgraded to AndroidX for latest reference.
+- Upgraded to support release from jitpack.io for easier installation on android apps.
+- Some minor discrepency is also fixed.
 
 SwitchButton.An *beautiful+lightweight+custom-style-easy* switch widget for Android,minSdkVersion >= 11<br>
 issues welcome~<br>
@@ -16,22 +21,42 @@ Features
 -drag switch supported<br>
 
 
-UseAge
+Integration
 -------
 gradle:
 ```grovvy
-repositories {
-    mavenCentral()
-    jcenter()
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
 }
-
 ...
 
 dependencies {
-    compile 'com.github.zcweng:switch-button:0.0.3@aar'
+    implementation 'com.github.belljay:SwitchButton:1.0.0'
 }
 ```
 
+maven:
+```
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+...
+
+<dependency>
+    <groupId>com.github.belljay</groupId>
+    <artifactId>SwitchButton</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+
+Useage
+-------
 layout.xml:
 ```xml
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -72,24 +97,24 @@ switchButton.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener
 
 More Style:
 ```xml
-<attr name="sb_shadow_radius" format="reference|dimension"/>       阴影半径
-<attr name="sb_shadow_offset" format="reference|dimension"/>       阴影偏移
-<attr name="sb_shadow_color" format="reference|color"/>            阴影颜色
-<attr name="sb_uncheck_color" format="reference|color"/>           关闭颜色
-<attr name="sb_checked_color" format="reference|color"/>           开启颜色
-<attr name="sb_border_width" format="reference|dimension"/>        边框宽度
-<attr name="sb_checkline_color" format="reference|color"/>         开启指示器颜色
-<attr name="sb_checkline_width" format="reference|dimension"/>     开启指示器线宽
-<attr name="sb_uncheckcircle_color" format="reference|color"/>     关闭指示器颜色
-<attr name="sb_uncheckcircle_width" format="reference|dimension"/> 关闭指示器线宽
-<attr name="sb_uncheckcircle_radius" format="reference|dimension"/>关闭指示器半径
-<attr name="sb_checked" format="reference|boolean"/>               是否选中
-<attr name="sb_shadow_effect" format="reference|boolean"/>         是否启用阴影
-<attr name="sb_effect_duration" format="reference|integer"/>       动画时间，默认300ms
-<attr name="sb_button_color" format="reference|color"/>            按钮颜色
-<attr name="sb_show_indicator" format="reference|boolean"/>        是否显示指示器，默认true：显示
-<attr name="sb_background" format="reference|color"/>              背景色，默认白色
-<attr name="sb_enable_effect" format="reference|boolean"/>         是否启用特效，默认true
+<attr name="sb_shadow_radius" format="reference|dimension"/>       阴影半径  /  Shadow Radius
+<attr name="sb_shadow_offset" format="reference|dimension"/>       阴影偏移  /  Shadow Position Offset
+<attr name="sb_shadow_color" format="reference|color"/>            阴影颜色  /  Shadow Color
+<attr name="sb_uncheck_color" format="reference|color"/>           关闭颜色  /  Unchecked Color
+<attr name="sb_checked_color" format="reference|color"/>           开启颜色  /  Checked Color
+<attr name="sb_border_width" format="reference|dimension"/>        边框宽度  /  Border Thickness
+<attr name="sb_checkline_color" format="reference|color"/>         开启指示器颜色  /  Checked Indicator Line Color
+<attr name="sb_checkline_width" format="reference|dimension"/>     开启指示器线宽  /  Checked Indicator Line Thickness
+<attr name="sb_uncheckcircle_color" format="reference|color"/>     关闭指示器颜色  /  unchecked Indicator Cicle Color
+<attr name="sb_uncheckcircle_width" format="reference|dimension"/> 关闭指示器线宽  /  unchecked Indicator Cicle Thickness
+<attr name="sb_uncheckcircle_radius" format="reference|dimension"/>关闭指示器半径  /  unchecked Indicator Cicle Radius
+<attr name="sb_checked" format="reference|boolean"/>               是否选中   /  is checked
+<attr name="sb_shadow_effect" format="reference|boolean"/>         是否启用阴影  /  Turn on Shadow
+<attr name="sb_effect_duration" format="reference|integer"/>       动画时间，默认300ms  /  Animation Duration, default 300ms
+<attr name="sb_button_color" format="reference|color"/>            按钮颜色  /  Button Color
+<attr name="sb_show_indicator" format="reference|boolean"/>        是否显示指示器，默认true  /  enable indicator, default: true
+<attr name="sb_background" format="reference|color"/>              背景色，默认白色  / Background color, default white
+<attr name="sb_enable_effect" format="reference|boolean"/>         是否启用特效，默认true / Enable Effect, default true
 ```
 
 
