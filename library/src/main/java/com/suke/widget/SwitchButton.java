@@ -67,6 +67,176 @@ public class SwitchButton extends View implements Checkable {
         super.setPadding(0, 0, 0, 0);
     }
 
+    @Override
+    public void setChecked(boolean checked) {
+        if(checked == isChecked()){
+            postInvalidate();
+            return;
+        }
+        toggle(enableEffect, false);
+    }
+
+    @Override
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    @Override
+    public void toggle() {
+        toggle(true);
+    }
+
+    /**
+     * 切换状态
+     * @param animate
+     */
+    public void toggle(boolean animate) {
+        toggle(animate, true);
+    }
+
+    /**
+     * 改变选中按钮颜色
+     * @param color a ColorInt value
+     */
+    public void setCheckedButtonColor(int color) {
+        checkedButtonColor = color;
+    }
+
+    /**
+     * 改变未选中按钮颜色
+     * @param color a ColorInt value
+     */
+    public void setUncheckButtonColor(int color) {
+        uncheckButtonColor = color;
+    }
+
+    @Override
+    public final void setOnClickListener(OnClickListener l) {}
+
+    @Override
+    public final void setOnLongClickListener(OnLongClickListener l) {}
+
+    public void setOnCheckedChangeListener(OnCheckedChangeListener l){
+        onCheckedChangeListener = l;
+    }
+
+    public interface OnCheckedChangeListener{
+        void onCheckedChanged(SwitchButton view, boolean isChecked);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if(!isEnabled()){return false;}
+        int actionMasked = event.getActionMasked();
+
+        switch (actionMasked){
+            case MotionEvent.ACTION_DOWN:{
+                isTouchingDown = true;
+                touchDownTime = System.currentTimeMillis();
+                //取消准备进入拖动状态
+                removeCallbacks(postPendingDrag);
+                //预设100ms进入拖动状态
+                postDelayed(postPendingDrag, 100);
+                break;
+            }
+            case MotionEvent.ACTION_MOVE:{
+                float eventX = event.getX();
+                if(isPendingDragState()){
+                    //在准备进入拖动状态过程中，可以拖动按钮位置
+                    float fraction = eventX / getWidth();
+                    fraction = Math.max(0f, Math.min(1f, fraction));
+
+                    viewState.buttonX = buttonMinX
+                            + (buttonMaxX - buttonMinX)
+                            * fraction;
+
+                }else if(isDragState()){
+                    //拖动按钮位置，同时改变对应的背景颜色
+                    float fraction = eventX / getWidth();
+                    fraction = Math.max(0f, Math.min(1f, fraction));
+
+                    viewState.buttonX = buttonMinX
+                            + (buttonMaxX - buttonMinX)
+                            * fraction;
+
+                    viewState.checkStateColor = (int) argbEvaluator.evaluate(
+                            fraction,
+                            uncheckColor,
+                            checkedColor
+                    );
+                    postInvalidate();
+
+                }
+                break;
+            }
+            case MotionEvent.ACTION_UP:{
+                isTouchingDown = false;
+                //取消准备进入拖动状态
+                removeCallbacks(postPendingDrag);
+
+                if(System.currentTimeMillis() - touchDownTime <= 300){
+                    //点击时间小于300ms，认为是点击操作
+                    toggle();
+                }else if(isDragState()){
+                    //在拖动状态，计算按钮位置，设置是否切换状态
+                    float eventX = event.getX();
+                    float fraction = eventX / getWidth();
+                    fraction = Math.max(0f, Math.min(1f, fraction));
+                    boolean newCheck = fraction > .5f;
+                    if(newCheck == isChecked()){
+                        pendingCancelDragState();
+                    }else{
+                        isChecked = newCheck;
+                        pendingSettleState();
+                    }
+                }else if(isPendingDragState()){
+                    //在准备进入拖动状态过程中，取消之，复位
+                    pendingCancelDragState();
+                }
+                break;
+            }
+            case MotionEvent.ACTION_CANCEL:{
+                isTouchingDown = false;
+
+                removeCallbacks(postPendingDrag);
+
+                if(isPendingDragState()
+                        || isDragState()){
+                    //复位
+                    pendingCancelDragState();
+                }
+                break;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 设置是否启用阴影效果
+     * @param shadowEffect true.启用
+     */
+    public void setShadowEffect(boolean shadowEffect) {
+        if(this.shadowEffect == shadowEffect){return;}
+        this.shadowEffect = shadowEffect;
+
+        if(this.shadowEffect){
+            buttonPaint.setShadowLayer(
+                    shadowRadius,
+                    0, shadowOffset,
+                    shadowColor);
+        }else{
+            buttonPaint.setShadowLayer(
+                    0,
+                    0, 0,
+                    0);
+        }
+    }
+
+    public void setEnableEffect(boolean enable){
+        this.enableEffect = enable;
+    }
+
+
     /**
      * 初始化参数
      */
@@ -465,33 +635,6 @@ public class SwitchButton extends View implements Checkable {
         canvas.drawCircle(x, y, buttonRadius, paint);
     }
 
-    @Override
-    public void setChecked(boolean checked) {
-        if(checked == isChecked()){
-            postInvalidate();
-            return;
-        }
-        toggle(enableEffect, false);
-    }
-
-    @Override
-    public boolean isChecked() {
-        return isChecked;
-    }
-
-    @Override
-    public void toggle() {
-        toggle(true);
-    }
-
-    /**
-     * 切换状态
-     * @param animate
-     */
-    public void toggle(boolean animate) {
-        toggle(animate, true);
-    }
-
     private void toggle(boolean animate, boolean broadcast) {
         if(!isEnabled()){return;}
 
@@ -548,94 +691,6 @@ public class SwitchButton extends View implements Checkable {
     }
 
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        if(!isEnabled()){return false;}
-        int actionMasked = event.getActionMasked();
-
-        switch (actionMasked){
-            case MotionEvent.ACTION_DOWN:{
-                isTouchingDown = true;
-                touchDownTime = System.currentTimeMillis();
-                //取消准备进入拖动状态
-                removeCallbacks(postPendingDrag);
-                //预设100ms进入拖动状态
-                postDelayed(postPendingDrag, 100);
-                break;
-            }
-            case MotionEvent.ACTION_MOVE:{
-                float eventX = event.getX();
-                if(isPendingDragState()){
-                    //在准备进入拖动状态过程中，可以拖动按钮位置
-                    float fraction = eventX / getWidth();
-                    fraction = Math.max(0f, Math.min(1f, fraction));
-
-                    viewState.buttonX = buttonMinX
-                            + (buttonMaxX - buttonMinX)
-                            * fraction;
-
-                }else if(isDragState()){
-                    //拖动按钮位置，同时改变对应的背景颜色
-                    float fraction = eventX / getWidth();
-                    fraction = Math.max(0f, Math.min(1f, fraction));
-
-                    viewState.buttonX = buttonMinX
-                            + (buttonMaxX - buttonMinX)
-                            * fraction;
-
-                    viewState.checkStateColor = (int) argbEvaluator.evaluate(
-                            fraction,
-                            uncheckColor,
-                            checkedColor
-                    );
-                    postInvalidate();
-
-                }
-                break;
-            }
-            case MotionEvent.ACTION_UP:{
-                isTouchingDown = false;
-                //取消准备进入拖动状态
-                removeCallbacks(postPendingDrag);
-
-                if(System.currentTimeMillis() - touchDownTime <= 300){
-                    //点击时间小于300ms，认为是点击操作
-                    toggle();
-                }else if(isDragState()){
-                    //在拖动状态，计算按钮位置，设置是否切换状态
-                    float eventX = event.getX();
-                    float fraction = eventX / getWidth();
-                    fraction = Math.max(0f, Math.min(1f, fraction));
-                    boolean newCheck = fraction > .5f;
-                    if(newCheck == isChecked()){
-                        pendingCancelDragState();
-                    }else{
-                        isChecked = newCheck;
-                        pendingSettleState();
-                    }
-                }else if(isPendingDragState()){
-                    //在准备进入拖动状态过程中，取消之，复位
-                    pendingCancelDragState();
-                }
-                break;
-            }
-            case MotionEvent.ACTION_CANCEL:{
-                isTouchingDown = false;
-
-                removeCallbacks(postPendingDrag);
-
-                if(isPendingDragState()
-                        || isDragState()){
-                    //复位
-                    pendingCancelDragState();
-                }
-                break;
-            }
-        }
-        return true;
-    }
-
-
     /**
      * 是否在动画状态
      * @return
@@ -659,31 +714,6 @@ public class SwitchButton extends View implements Checkable {
      */
     private boolean isDragState(){
         return animateState == ANIMATE_STATE_DRAGING;
-    }
-
-    /**
-     * 设置是否启用阴影效果
-     * @param shadowEffect true.启用
-     */
-    public void setShadowEffect(boolean shadowEffect) {
-        if(this.shadowEffect == shadowEffect){return;}
-        this.shadowEffect = shadowEffect;
-
-        if(this.shadowEffect){
-            buttonPaint.setShadowLayer(
-                    shadowRadius,
-                    0, shadowOffset,
-                    shadowColor);
-        }else{
-            buttonPaint.setShadowLayer(
-                    0,
-                    0, 0,
-                    0);
-        }
-    }
-
-    public void setEnableEffect(boolean enable){
-        this.enableEffect = enable;
     }
 
     /**
@@ -755,21 +785,6 @@ public class SwitchButton extends View implements Checkable {
             setUncheckViewState(afterState);
         }
         valueAnimator.start();
-    }
-
-
-    @Override
-    public final void setOnClickListener(OnClickListener l) {}
-
-    @Override
-    public final void setOnLongClickListener(OnLongClickListener l) {}
-
-    public void setOnCheckedChangeListener(OnCheckedChangeListener l){
-        onCheckedChangeListener = l;
-    }
-
-    public interface OnCheckedChangeListener{
-        void onCheckedChanged(SwitchButton view, boolean isChecked);
     }
 
     /*******************************************************/
