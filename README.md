@@ -1,5 +1,7 @@
 ![Android CI](https://github.com/belljay/SwitchButton/workflows/Android%20CI/badge.svg)
 [![](https://jitpack.io/v/belljay/SwitchButton.svg)](https://jitpack.io/#belljay/SwitchButton)
+[![](https://img.shields.io/badge/minSdkVersion-11-brightgreen)](https://shields.io/)
+[![](https://img.shields.io/badge/targetSdkVersion-29-blue)](https://shields.io/)
 
 # SwitchButton
 
@@ -8,6 +10,8 @@ Note: this repo is forked and fixed forward on top of the awesome repo of [zcwen
 - Ugraded API level to 29 so that it's compatiable with latest Google Play store requirements.
 - Codebase is also upgraded to AndroidX for latest reference.
 - Upgraded to support release from jitpack.io for easier installation on android apps.
+- Add Proguards
+- Add support for set button color programatically
 - Some minor discrepency is also fixed.
 
 SwitchButton.An *beautiful+lightweight+custom-style-easy* switch widget for Android,minSdkVersion >= 11<br>
@@ -34,7 +38,7 @@ allprojects {
 ...
 
 dependencies {
-    implementation 'com.github.belljay:SwitchButton:1.0.0'
+    implementation 'com.github.belljay:SwitchButton:1.0.1'
 }
 ```
 
@@ -51,7 +55,7 @@ maven:
 <dependency>
     <groupId>com.github.belljay</groupId>
     <artifactId>SwitchButton</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
@@ -112,6 +116,8 @@ More Style:
 <attr name="sb_shadow_effect" format="reference|boolean"/>         是否启用阴影  /  Turn on Shadow
 <attr name="sb_effect_duration" format="reference|integer"/>       动画时间，默认300ms  /  Animation Duration, default 300ms
 <attr name="sb_button_color" format="reference|color"/>            按钮颜色  /  Button Color
+<attr name="sb_checkedbutton_color" format="reference|color"/>     开启按钮颜色  /  Checked Button Color
+<attr name="sb_uncheckbutton_color" format="reference|color"/>     关闭按钮颜色  /  Unchecked Button Color
 <attr name="sb_show_indicator" format="reference|boolean"/>        是否显示指示器，默认true  /  enable indicator, default: true
 <attr name="sb_background" format="reference|color"/>              背景色，默认白色  / Background color, default white
 <attr name="sb_enable_effect" format="reference|boolean"/>         是否启用特效，默认true / Enable Effect, default true
