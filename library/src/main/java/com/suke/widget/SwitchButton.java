@@ -110,6 +110,14 @@ public class SwitchButton extends View implements Checkable {
         uncheckButtonColor = color;
     }
 
+    /**
+     * 改变是否添加按钮的圆形边框
+     * @param value whether to enable the button edge frame
+     */
+    public void setButtonEdgeFrame(boolean value) {
+        buttonEdgeFrame = value;
+    }
+
     @Override
     public final void setOnClickListener(OnClickListener l) {}
 
@@ -313,6 +321,8 @@ public class SwitchButton extends View implements Checkable {
         checkedButtonColor = optColor(typedArray,
                 R.styleable.SwitchButton_sb_checkedbutton_color,
                 buttonColor);
+
+        buttonEdgeFrame = true;
 
         int effectDuration = optInt(typedArray,
                 R.styleable.SwitchButton_sb_effect_duration,
@@ -629,10 +639,12 @@ public class SwitchButton extends View implements Checkable {
     private void drawButton(Canvas canvas, float x, float y) {
         canvas.drawCircle(x, y, buttonRadius, buttonPaint);
 
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(1);
-        paint.setColor(0XffDDDDDD);
-        canvas.drawCircle(x, y, buttonRadius, paint);
+        if (buttonEdgeFrame) {
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(1);
+            paint.setColor(0XffDDDDDD);
+            canvas.drawCircle(x, y, buttonRadius, paint);
+        }
     }
 
     private void toggle(boolean animate, boolean broadcast) {
@@ -936,6 +948,11 @@ public class SwitchButton extends View implements Checkable {
      * Color for button when it's check
      */
     private int checkedButtonColor;
+    /**
+     * Whether to have a edge circle on the circle button, white color.
+     * Useful when your button is transparent.
+     */
+    private boolean buttonEdgeFrame;
     
     
     /**
